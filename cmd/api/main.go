@@ -49,9 +49,12 @@ func run() error {
 
 	switch cfg.Storage {
 	case config.StorageRedis:
-		client := redis.NewClient(&redis.Options{
-			Addr: cfg.RedisURL,
-		})
+		opts, err := redis.ParseURL(cfg.RedisURL)
+		if err != nil {
+			return fmt.Errorf("parsing redis url: %w", err)
+		}
+
+		client := redis.NewClient(opts)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
