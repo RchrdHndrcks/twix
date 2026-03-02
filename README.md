@@ -8,14 +8,16 @@ and view a timeline of tweets from the people they follow.
 
 User identification is handled via the `X-User-ID` header on every request.
 
+The API is live at `https://twix.franconiz.com`.
+
 | Method | Route | Description |
 |--------|-------|-------------|
-| `POST` | `/v1/users` | Create a new user |
-| `POST` | `/v1/tweets` | Publish a tweet (max 280 chars) |
-| `GET` | `/v1/tweets/:id` | Get a single tweet by ID |
-| `POST` | `/v1/users/:id/follow` | Follow a user |
-| `DELETE` | `/v1/users/:id/follow` | Unfollow a user |
-| `GET` | `/v1/timeline` | Get the authenticated user's timeline |
+| `POST` | [`/v1/users`](https://twix.franconiz.com/v1/users) | Create a new user |
+| `POST` | [`/v1/tweets`](https://twix.franconiz.com/v1/tweets) | Publish a tweet (max 280 chars) |
+| `GET` | [`/v1/tweets/:id`](https://twix.franconiz.com/v1/tweets/:id) | Get a single tweet by ID |
+| `POST` | [`/v1/users/:id/follow`](https://twix.franconiz.com/v1/users/:id/follow) | Follow a user |
+| `DELETE` | [`/v1/users/:id/follow`](https://twix.franconiz.com/v1/users/:id/follow) | Unfollow a user |
+| `GET` | [`/v1/timeline`](https://twix.franconiz.com/v1/timeline) | Get the authenticated user's timeline |
 
 ### Timeline Pagination
 
@@ -223,6 +225,18 @@ twix/
   Spin up real dependencies (Redis, etc.) in containers using `testcontainers-go`.
   Make real HTTP requests against the full stack with no mocks.
   Cover the main use cases end-to-end: publish a tweet, follow a user, read timeline.
+- **Production smoke tests**: Ran against the live deployment at `https://twix.franconiz.com`
+  with Redis storage. 38 tests covering:
+
+  | Category | Tests | Cases covered |
+  |----------|-------|---------------|
+  | **Users** | 5 | Create user, empty username, missing body |
+  | **Tweets** | 7 | Create tweet, empty content, 281 chars, boundary 280 chars, boundary 1 char, get by ID, get nonexistent |
+  | **Follow** | 5 | Follow user, self-follow prevention, duplicate follow, unfollow, double unfollow |
+  | **Timeline** | 9 | View timeline, cursor-based pagination (3 pages + empty page), empty timeline, post-unfollow behavior, re-follow behavior |
+  | **Auth** | 4 | Missing `X-User-ID` on tweet, follow, unfollow, and timeline |
+  | **Fan-out on write** | 6 | New tweets appear in followers' timelines, tweets stop appearing after unfollow, tweets resume after re-follow, no backfill of missed tweets |
+  | **Cross-user flows** | 2 | Bidirectional follow, public vs authenticated endpoints |
 
 ## Running the Project
 
