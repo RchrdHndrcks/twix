@@ -1,0 +1,20 @@
+Business Assumptions
+====================
+
+1. User identification is sent via the `X-User-ID` HTTP header.
+
+2. Users are pre-existing. There is no user registration flow, but a minimal user creation
+   endpoint is provided for convenience (seeding data, testing).
+
+3. A user cannot follow themselves.
+
+4. A user cannot follow the same user twice (idempotent operation).
+
+5. Tweets are immutable once created. No editing or deleting.
+
+6. The timeline only shows tweets from users the authenticated user follows,
+   not their own tweets.
+
+7. No rate limiting or spam protection is implemented.
+
+8. The timeline has a finite depth (e.g., last 1000 tweets). Older entries are not retrieved.
